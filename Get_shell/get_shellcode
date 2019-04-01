@@ -1,0 +1,31 @@
+#!/bin/bash
+get_shell() {
+objdump -d ./$1|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|sed 's/ /\\x/g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
+}
+
+get_opcode() {
+objdump -d ./$1|grep '[0-9a-f]:'|grep -v 'file'|cut -f2 -d:|cut -f1-6 -d' '|tr -s ' '|tr '\t' ' '|sed 's/ $//g'|paste -d '' -s |sed 's/^/"/'|sed 's/$/"/g'
+}
+raise_error() {
+	  local error_message="$@"
+	    echo -e "\n${error_message}" 1>&2;
+	    echo "-s: shell format"
+	    echo -e "-op: opcode format\n"
+}
+
+argument="$1"
+
+if [[ -z $argument ]] ; then
+	  raise_error "Need argument to run"
+else
+	case $argument in 
+		-s|--shell)
+			get_shell "$2";;
+		-op|--opcode)
+			get_opcode "$2";;
+		*)
+			raise_error "Wrong argument"
+			;;
+	esac
+fi
+	  
